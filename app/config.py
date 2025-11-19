@@ -1,9 +1,9 @@
 import os
 
 
-AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
-AWS_ENDPOINT = os.getenv("AWS_ENDPOINT", "http://localstack:4566")
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "test")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "test")
-SQS_QUEUE_NAME = os.getenv("SQS_QUEUE_NAME", "ai-jobs")
-AWS_FAKE = os.getenv("AWS_FAKE", "0")
+MQ_HOST = os.getenv("MQ_HOST", "rabbitmq")
+MQ_PORT = int(os.getenv("MQ_PORT", "5672"))
+MQ_USER = os.getenv("MQ_USER", "user")
+MQ_PASS = os.getenv("MQ_PASS", "pass")
+MQ_QUEUE_NAME = os.getenv("MQ_QUEUE_NAME", "ai-jobs")
+MQ_FAKE = os.getenv("MQ_FAKE", "0")

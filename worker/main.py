@@ -1,9 +1,8 @@
 import json
 import time
 
-from app.aws import get_sqs_client
 from app import config
-from app.queue import ensure_queue
+from app.mq import ensure_queue
 from .engine import summarize
 
 
@@ -17,16 +16,17 @@ def process_message(body: dict) -> None:
 
 
 def run():
-    url, _ = ensure_queue()
-    client = get_sqs_client()
+    ch_or_fake = ensure_queue()
     while True:
-        resp = client.receive_message(QueueUrl=url, MaxNumberOfMessages=5, WaitTimeSeconds=5)
-        for msg in resp.get("Messages", []):
-            try:
-                body = json.loads(msg["Body"])  # type: ignore
+        if config.MQ_FAKE == "1":
+            msgs = ch_or_fake.get_many(config.MQ_QUEUE_NAME, 5)  # type: ignore
+            for m in msgs:
+                body = json.loads(m["body"])  # type: ignore
                 process_message(body)
-            finally:
-                client.delete_message(QueueUrl=url, ReceiptHandle=msg["ReceiptHandle"])  # type: ignore
+        else:
+            method_frame, header_frame, body = ch_or_fake.basic_get(queue=config.MQ_QUEUE_NAME, auto_ack=True)  # type: ignore
+            if method_frame:
+                process_message(json.loads(body))
         time.sleep(1)
 
 
